@@ -8,7 +8,7 @@ from keyboards import post_keyboard
 from settings import bot
 import urllib.parse
 
-post_count_on_page = 1  # кол-во выводимых постов
+post_count_on_page = 5  # кол-во выводимых постов
 
 usersData = {}
 store = Store()
@@ -31,6 +31,7 @@ async def show_posts(message):
 
     offset = usersData[message['from'].id]['offset']
 
+    # todo добавить отображение кол-ва найденных записей
     if len(posts) == 0:
         await bot.send_message(message.chat.id, 'По вашему запросу ничего не найдено :(')
         return
@@ -43,7 +44,14 @@ async def show_posts(message):
 Локация: {post['location']}
 Описание:\n{post['description']}
                                  """
-
+        print(post)
+        # ошибка - 'https://novi.kupujemprodajem.com/audio/slusalice/apple-airpods-pro-2-gen/oglas/154588036?filterId=3601436862'
+        # по картинке https://images.kupujemprodajem.com/photos/oglasi/6/03/154588036/big-154588036_64b6933f874357-58580740IMG_0536.HEIC'
+        # todo сделать обработку ошибок
+        #  сделать проверку размера файла, а не через try/cath
+        #  добавить сортировки
+        #  добавить фильтры
+        #  добавить настройку отображения кол-ва страниц
         try:
             await bot.send_photo(message.chat.id, post['img'], caption, parse_mode='MARKDOWN', reply_markup=keyboard)
         except:
@@ -68,4 +76,6 @@ async def show_post(callback_query):
             await bot.send_media_group(callback_query.from_user.id, images)
             images = []
 
+    # todo добавить отображение цены, контактов, ссылку, заголовок, локацию
+    #  добавить провреку на длину описания и разбивать его на несколько сообщений тогда
     await bot.send_message(callback_query.from_user.id, post['description'], reply_markup=post_keyboard)
