@@ -1,3 +1,5 @@
+import re
+
 from googletrans import Translator
 
 
@@ -8,6 +10,15 @@ def translate_to_ru(text):
 
 
 def translate_to_sr(text):
+    searched = re.findall('[A-z]+', text)
+    parts = re.split('[A-z]+', text)
+    res = []
     translator = Translator()
-    result = translator.translate(text, src='ru', dest='sr')
-    return result.text
+
+    for index, part in enumerate(parts):
+        if part:
+            res.append(translator.translate(part, src='ru', dest='sr').text)
+        if index < len(searched):
+            res.append(searched[index])
+
+    return ' '.join(res)
