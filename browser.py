@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from translator import translate_to_ru
 
 
-async def search_product(request, callback, chat_id):
+async def _get_soap_from_page(url) -> BeautifulSoup():
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
@@ -13,19 +13,23 @@ async def search_product(request, callback, chat_id):
     # service=Service(FirefoxDriverManager().install())
     browser = webdriver.Firefox(options=options)
 
-    browser.get("https://novi.kupujemprodajem.com/pretraga?keywords=" + request)
+    browser.get(url)
     soup = BeautifulSoup(browser.page_source, features='html.parser')
     browser.quit()
+    return soup
 
+
+async def search_posts(source_url):
+    soup = await _get_soap_from_page(source_url)
+    print(source_url)
+    posts = []
     cards = soup.findAll('section', 'AdItem_adOuterHolder__i2qTf')
-    print(f'searched: {len(cards)}')
-    for card in cards[:3]:
+    for card in cards:
         article = card.find_next('article')
         main_block = article.find_next('a').find_next_sibling('div')
         [title_box, price_block, some_info, location_block] = main_block.contents
 
         img = article.find_next('a').find_next('img').get_attribute_list('src')[0]
-        print(f'searched: {img}')
 
         a = title_box.find_next('a')
         title = a.find_next('div').text
@@ -35,12 +39,33 @@ async def search_product(request, callback, chat_id):
 
         price = price_block.find_next('div').find_next('div').text
         location = location_block.find_next('p').text
+        print(url)
 
-        await callback({
+        posts.append({
             'img': img.replace('tmb-300x300', 'big'),
+            'small_img': img,
             'url': 'https://novi.kupujemprodajem.com' + url,
             'title': translate_to_ru(title),
             'description': translate_to_ru(description),
             'price': translate_to_ru(price),
             'location': location
-        }, chat_id)
+        })
+
+    return posts
+
+
+async def get_post(url):
+    soup = await _get_soap_from_page(url)
+
+    info = soup.findAll('section', 'AdViewDescription_descriptionHolder__9hET7')[0].find_next('div')
+    images_src = []
+    images = soup.findAll('div', 'GalleryThumbnail_imageGalleryThumbnailInner___ou1n')
+    for image in images:
+        images_src.append(image.find_next('img').get_attribute_list('src')[0].replace('tmb-300x300-', ''))
+
+    print(images_src)
+
+    return {
+        'description': translate_to_ru(info.text),
+        'images': images_src
+    }
