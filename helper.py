@@ -17,6 +17,7 @@ async def get_cached_data(url: str, get_data: callable) -> list or dict:
     if data is None:
         data = await get_data(url)
         r.set(url, json.JSONEncoder().encode(data))
+        r.expire(url, 60*60*24)
     else:
         data = json.JSONDecoder().decode(data)
 

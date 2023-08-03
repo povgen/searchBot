@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from bs4 import BeautifulSoup
 
@@ -14,6 +15,16 @@ async def _get_soap_from_page(url) -> BeautifulSoup():
     browser = webdriver.Firefox(options=options)
 
     browser.get(url)
+    buttons = browser.find_elements(By.CLASS_NAME, 'ButtonExpand_expandHolder__ZnxCZ')
+    print(len(buttons))
+    if len(buttons) > 0:
+        browser.find_element(By.CLASS_NAME, 'Modal_closeIcon__29nCg').click()
+        browser.find_element(By.CLASS_NAME, 'CookieConsent_button__z3J_H').click()
+        if len(buttons) >= 2:
+            buttons[1].click()
+        else:
+            buttons[0].click()
+
     soup = BeautifulSoup(browser.page_source, features='html.parser')
     browser.quit()
     return soup
@@ -23,6 +34,10 @@ async def search_posts(source_url):
     soup = await _get_soap_from_page(source_url)
     print(source_url)
     posts = []
+    print(soup.findAll('div', 'BreadcrumbHolder_breadcrumb__utk3j'))
+    crumbs = soup.findAll('div', 'BreadcrumbHolder_breadcrumb__utk3j')[0]
+    crumbs = crumbs.find_next('div')
+    total = int(crumbs.text.split('>')[-1].split('rezultata')[0].replace('.', ''))
     cards = soup.findAll('section', 'AdItem_adOuterHolder__i2qTf')
     for card in cards:
         article = card.find_next('article')
@@ -51,11 +66,29 @@ async def search_posts(source_url):
             'location': location
         })
 
-    return posts
+    return {
+        'posts': posts,
+        'total': total
+    }
 
 
 async def get_post(url):
     soup = await _get_soap_from_page(url)
+
+    price = soup.findAll('div', 'AdViewInfo_adInfoPrice__pVuSx')[0].find_next('h2').text
+    title_block = soup.findAll('div', 'AdViewInfo_nameHolder__md4J1')[0]
+    title = title_block.find_next('h1').text
+    condition = title_block.find_next('div').text
+    [account_age, location] = soup.findAll('div', 'UserSummary_userDetails__tNXN7')[0].find_next('div').contents
+
+    buttons = soup.findAll('div', 'ButtonExpand_holder___pAqB')
+
+    if len(buttons) == 1:
+        phone = buttons[0].find_next('span').text
+    elif len(buttons) > 1:
+        phone = buttons[1].find_next('span').text
+    else:
+        phone = '-'
 
     info = soup.findAll('section', 'AdViewDescription_descriptionHolder__9hET7')[0].find_next('div')
     images_src = []
@@ -63,9 +96,13 @@ async def get_post(url):
     for image in images:
         images_src.append(image.find_next('img').get_attribute_list('src')[0].replace('tmb-300x300-', ''))
 
-    print(images_src)
-
     return {
+        'url': url,
+        'title': translate_to_ru(title),
+        'price': translate_to_ru(price),
+        'condition': translate_to_ru(condition),
         'description': translate_to_ru(info.text),
-        'images': images_src
+        'images': images_src,
+        'phone': phone,
+        'location': location.text
     }

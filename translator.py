@@ -16,7 +16,7 @@ def translate_to_sr(text):
     translator = Translator()
 
     for index, part in enumerate(parts):
-        if part:
+        if part.strip():
             res.append(translator.translate(part, src='ru', dest='sr').text)
         if index < len(searched):
             res.append(searched[index])

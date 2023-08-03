@@ -1,7 +1,7 @@
 import urllib
 
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
-
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto, InputFile
+import requests
 from browser import search_posts, get_post
 from helper import get_cached_data, Store
 from keyboards import post_keyboard
@@ -27,36 +27,51 @@ def get_search_url(user_id):
 
 async def show_posts(message):
     url = get_search_url(message['from'].id)
-    posts = await get_cached_data(url, search_posts)
-
+    searched_data = await get_cached_data(url, search_posts)
+    posts = searched_data['posts']
+    total = searched_data['total']
     offset = usersData[message['from'].id]['offset']
 
-    # todo добавить отображение кол-ва найденных записей
     if len(posts) == 0:
         await bot.send_message(message.chat.id, 'По вашему запросу ничего не найдено :(')
         return
 
-    for post in posts[offset:offset + post_count_on_page]:
+    for key, post in enumerate(posts[offset:offset + post_count_on_page]):
         keyboard = get_post_item_keyboard(post['url'])
+        num = (usersData[message['from'].id]['url_parts']['page'] - 1) * 30 + key + 1 + offset
         caption = f"""
 [{post['title']}]({post['url']})
 Цена: {post['price']}
 Локация: {post['location']}
 Описание:\n{post['description']}
-                                 """
+Объявление {num} из {total} """ # todo переделать на отображение в клавиатуре?
+
+        caption = caption.replace('*', '\*')
+
+        image = post['img']
         print(post)
-        # ошибка - 'https://novi.kupujemprodajem.com/audio/slusalice/apple-airpods-pro-2-gen/oglas/154588036?filterId=3601436862'
-        # по картинке https://images.kupujemprodajem.com/photos/oglasi/6/03/154588036/big-154588036_64b6933f874357-58580740IMG_0536.HEIC'
-        # todo сделать обработку ошибок
-        #  сделать проверку размера файла, а не через try/cath
-        #  добавить сортировки
-        #  добавить фильтры
-        #  добавить настройку отображения кол-ва страниц
-        try:
-            await bot.send_photo(message.chat.id, post['img'], caption, parse_mode='MARKDOWN', reply_markup=keyboard)
-        except:
-            await bot.send_photo(message.chat.id, post['small_img'], caption, parse_mode='MARKDOWN',
-                                 reply_markup=keyboard)
+        img_file = requests.get(image)
+
+        if img_file.content.__sizeof__() > 10000000:
+            img_file = requests.get(post['small_img'])
+            image = post['small_img']
+
+        img_ext: str = image.split('.')[-1]
+
+        if img_ext == 'HEIC':
+            file_name = f'./images/{hash(image)}.jpg'
+            out = open(file_name, 'wb')
+            out.write(img_file.content)
+            out.close()
+            image = InputFile(file_name)
+
+        #  todo
+        #   добавить сортировки
+        #   добавить фильтры
+        #   добавить настройку отображения кол-ва постов на странице
+
+        await bot.send_photo(message.chat.id, image, caption, parse_mode='MARKDOWN',
+                             reply_markup=keyboard)
 
 
 async def show_post(callback_query):
