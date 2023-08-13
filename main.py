@@ -1,5 +1,6 @@
 import datetime
 import logging
+import os
 
 from aiogram import types
 from aiogram.dispatcher import filters, FSMContext
@@ -11,7 +12,8 @@ from settings import dp, bot, BotStates, orders
 from translator import translate_to_sr
 from user import User
 
-logging.basicConfig(level=logging.INFO, filename="log.log")
+os.makedirs('logs', exist_ok=True)
+logging.basicConfig(level=logging.INFO, filename="logs/log.log")
 
 
 @dp.message_handler(commands=['start'])
@@ -39,7 +41,7 @@ async def save_feedback(message, state: FSMContext):
 
     feedback = f'{now} {name} (@{username}): \n\t {message.text} \n\n'
 
-    with open('feedback.txt', 'a', encoding="utf-8") as f:
+    with open('logs/feedback.txt', 'a', encoding="utf-8") as f:
         f.write(feedback)
 
     await bot.send_message(message.chat.id, 'Спасибо за ваш отзыв')
