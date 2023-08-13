@@ -15,7 +15,6 @@ post_count_on_page = 5  # кол-во выводимых постов
 
 usersData = {}
 store = Store()
-orders = ('price', 'price desc', 'posted desc', 'view_count desc', 'relevance')
 
 
 def get_post_item_keyboard(url):
@@ -45,7 +44,7 @@ async def show_posts(message):
 Цена: {post['price']}
 Локация: {post['location']}
 Описание:\n{post['description']}
-Объявление {num} из {total} """  # todo переделать на отображение в клавиатуре?
+Объявление {num} из {total} """
 
         caption = caption.replace('*', '\*')
 
@@ -65,10 +64,6 @@ async def show_posts(message):
             out.write(img_file.content)
             out.close()
             image = InputFile(file_name)
-
-        #  todo
-        #   добавить фильтры
-        #   добавить настройку отображения кол-ва постов на странице
 
         await bot.send_photo(message.chat.id, image, caption, parse_mode='MARKDOWN',
                              reply_markup=keyboard)

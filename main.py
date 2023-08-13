@@ -1,22 +1,15 @@
+import datetime
 import logging
 
 from aiogram import types
-from aiogram.dispatcher import filters
+from aiogram.dispatcher import filters, FSMContext
 from aiogram.utils import executor
 
 from keyboards import default_keyboard, order_keyboard
 from post_controller import show_posts, usersData, show_post, post_count_on_page
-from settings import dp, bot
+from settings import dp, bot, BotStates, orders
 from translator import translate_to_sr
 from user import User
-
-orders = {
-    '📶 Подешевле': 'price',
-    '📶 Подороже': 'price desc',
-    '📶 Новые': 'posted desc',
-    '📶 Популярные': 'view_count desc',
-    '📶 Релевантные': 'relevance'
-}
 
 logging.basicConfig(level=logging.INFO, filename="log.log")
 
@@ -24,12 +17,33 @@ logging.basicConfig(level=logging.INFO, filename="log.log")
 @dp.message_handler(commands=['start'])
 async def send_welcome(message):
     user = User(message['from'].id)
-
     user.user_info = message["from"]
 
     await bot.send_message(message.chat.id,
                            f'Привет {message["from"].first_name}, я могу найти для тебя что-нибудь',
                            reply_markup=default_keyboard)
+
+
+@dp.message_handler(commands=['feedback'])
+async def get_feedback(message):
+    await bot.send_message(message.chat.id, 'Пожалуйста введите ваш отзыв')
+    await BotStates.feedback.set()
+
+
+@dp.message_handler(state=BotStates.feedback)
+async def save_feedback(message, state: FSMContext):
+    username = message['from'].username
+    name = message['from'].first_name
+    now = datetime.datetime.now()
+    now = now.strftime("%d-%m-%Y %H:%M")
+
+    feedback = f'{now} {name} (@{username}): \n\t {message.text} \n\n'
+
+    with open('feedback.txt', 'a', encoding="utf-8") as f:
+        f.write(feedback)
+
+    await bot.send_message(message.chat.id, 'Спасибо за ваш отзыв')
+    await state.finish()
 
 
 @dp.message_handler(text='⬅️ Назад')
