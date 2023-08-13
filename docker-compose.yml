@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  redis:
+    image: redis:latest
+    expose:
+      - 6379
+
+  app:
+    build: .
+    container_name: search_bot
+    env_file:
+      - .env
+    depends_on:
+      - redis

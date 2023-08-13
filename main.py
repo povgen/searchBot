@@ -20,13 +20,13 @@ async def send_welcome(message):
     user.user_info = message["from"]
 
     await bot.send_message(message.chat.id,
-                           f'Привет {message["from"].first_name}, я могу найти для тебя что-нибудь',
+                           f'Привет, {message["from"].first_name}, я могу найти для тебя что-нибудь',
                            reply_markup=default_keyboard)
 
 
 @dp.message_handler(commands=['feedback'])
 async def get_feedback(message):
-    await bot.send_message(message.chat.id, 'Пожалуйста введите ваш отзыв')
+    await bot.send_message(message.chat.id, 'Пожалуйста, введите ваш отзыв')
     await BotStates.feedback.set()
 
 
