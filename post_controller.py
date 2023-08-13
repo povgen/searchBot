@@ -1,3 +1,4 @@
+import logging
 import urllib
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto, InputFile
@@ -7,6 +8,8 @@ from helper import get_cached_data, Store, splice_text_by_parts
 from keyboards import post_keyboard
 from settings import bot
 import urllib.parse
+
+from user import User
 
 post_count_on_page = 5  # кол-во выводимых постов
 
@@ -21,16 +24,14 @@ def get_post_item_keyboard(url):
     ])
 
 
-def get_search_url(user_id):
-    return 'https://novi.kupujemprodajem.com/pretraga?' + urllib.parse.urlencode(usersData[user_id]['url_parts'])
-
-
 async def show_posts(message):
-    url = get_search_url(message['from'].id)
-    searched_data = await get_cached_data(url, search_posts)
+    user = User(message['from'].id)
+    url = 'https://novi.kupujemprodajem.com/pretraga?' + urllib.parse.urlencode(user.request_params)
+
+    searched_data = await get_cached_data(url, search_posts, user.to_increment_count_of_requests)
     posts = searched_data['posts']
     total = searched_data['total']
-    offset = usersData[message['from'].id]['offset']
+    offset = user.offset
 
     if len(posts) == 0:
         await bot.send_message(message.chat.id, 'По вашему запросу ничего не найдено :(')
@@ -38,7 +39,7 @@ async def show_posts(message):
 
     for key, post in enumerate(posts[offset:offset + post_count_on_page]):
         keyboard = get_post_item_keyboard(post['url'])
-        num = (usersData[message['from'].id]['url_parts']['page'] - 1) * 30 + key + 1 + offset
+        num = (user.request_params['page'] - 1) * 30 + key + 1 + offset
         caption = f"""
 [{post['title']}]({post['url']})
 Цена: {post['price']}
@@ -49,7 +50,7 @@ async def show_posts(message):
         caption = caption.replace('*', '\*')
 
         image = post['img']
-        print(post)
+        logging.info('Выводим перед просмотр объявления:' + post)
         img_file = requests.get(image)
 
         if img_file.content.__sizeof__() > 10000000:
@@ -66,7 +67,6 @@ async def show_posts(message):
             image = InputFile(file_name)
 
         #  todo
-        #   добавить сортировки
         #   добавить фильтры
         #   добавить настройку отображения кол-ва постов на странице
 
@@ -81,7 +81,11 @@ async def show_post(callback_query):
         await bot.send_message(callback_query.from_user.id, 'Ссылка устарела, произведите новый поиск')
         return
 
-    post = await get_cached_data(post_url, get_post)
+    user = User(callback_query.from_user.id)
+
+    post = await get_cached_data(post_url, get_post, user.to_increment_count_of_requests)
+
+    logging.info('Показ объявления: ' + post)
 
     images = []
     for index, img in enumerate(post['images']):

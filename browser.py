@@ -1,3 +1,5 @@
+import logging
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
@@ -16,7 +18,6 @@ async def _get_soap_from_page(url) -> BeautifulSoup():
 
     browser.get(url)
     buttons = browser.find_elements(By.CLASS_NAME, 'ButtonExpand_expandHolder__ZnxCZ')
-    print(len(buttons))
     if len(buttons) > 0:
         browser.find_element(By.CLASS_NAME, 'Modal_closeIcon__29nCg').click()
         browser.find_element(By.CLASS_NAME, 'CookieConsent_button__z3J_H').click()
@@ -32,9 +33,8 @@ async def _get_soap_from_page(url) -> BeautifulSoup():
 
 async def search_posts(source_url):
     soup = await _get_soap_from_page(source_url)
-    print(source_url)
+    logging.info('url запроса: ' + source_url)
     posts = []
-    print(soup.findAll('div', 'BreadcrumbHolder_breadcrumb__utk3j'))
     crumbs = soup.findAll('div', 'BreadcrumbHolder_breadcrumb__utk3j')[0]
     crumbs = crumbs.find_next('div')
     total = int(crumbs.text.split('>')[-1].split('rezultata')[0].replace('.', ''))
@@ -54,7 +54,7 @@ async def search_posts(source_url):
 
         price = price_block.find_next('div').find_next('div').text
         location = location_block.find_next('p').text
-        print(url)
+        logging.info('url объявления: ' + url)
 
         posts.append({
             'img': img.replace('tmb-300x300', 'big'),

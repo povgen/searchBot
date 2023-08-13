@@ -1,2 +1,4 @@
 /.idea/*
 /geckodriver.log
+/.env
+/log.log
