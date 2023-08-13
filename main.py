@@ -46,6 +46,16 @@ async def save_feedback(message, state: FSMContext):
     await state.finish()
 
 
+@dp.message_handler(commands=['donate'])
+async def get_donate_info(message):
+    await bot.send_message(message.chat.id, """
+    Вы можете отблагодарить разработчика одним из следующих способов:
+    - Написать отзыв
+    - Посоветовать бота друзьям
+    - Отправить чаевые по реквизитам из описания бота
+    """)
+
+
 @dp.message_handler(text='⬅️ Назад')
 async def prev_posts(message):
     user = User(message['from'].id)

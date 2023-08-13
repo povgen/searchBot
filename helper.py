@@ -1,8 +1,11 @@
 import json
+import os
 
 import redis
+host: str = os.getenv('REDIS_HOST')
+port: int = int(os.getenv('REDIS_PORT'))
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host=host, port=port, decode_responses=True)
 
 
 async def get_cached_data(url: str, get_data: callable, hook_get_data: callable = None) -> list or dict:
