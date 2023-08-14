@@ -4,6 +4,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from bs4 import BeautifulSoup
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 from translator import translate_to_ru
 
@@ -13,8 +15,8 @@ async def _get_soap_from_page(url) -> BeautifulSoup():
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    # service=Service(FirefoxDriverManager().install())
-    browser = webdriver.Firefox(options=options)
+    #
+    browser = webdriver.Firefox(options=options, service=Service(ChromeDriverManager().install()))
 
     browser.get(url)
     buttons = browser.find_elements(By.CLASS_NAME, 'ButtonExpand_expandHolder__ZnxCZ')
