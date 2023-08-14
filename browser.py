@@ -26,12 +26,15 @@ async def _get_soap_from_page(url) -> BeautifulSoup():
     browser.get(url)
     buttons = browser.find_elements(By.CLASS_NAME, 'ButtonExpand_expandHolder__ZnxCZ')
     if len(buttons) > 0:
-        browser.find_element(By.CLASS_NAME, 'Modal_closeIcon__29nCg').click()
-        browser.find_element(By.CLASS_NAME, 'CookieConsent_button__z3J_H').click()
-        if len(buttons) >= 2:
-            buttons[1].click()
-        else:
-            buttons[0].click()
+        browser.execute_script("arguments[0].click();",  buttons[1 if len(buttons) >= 2 else 0])
+
+        #browser.find_element(By.CLASS_NAME, 'Modal_closeIcon__29nCg').click()
+        #browser.find_element(By.CLASS_NAME, 'CookieConsent_button__z3J_H').click()
+
+        # if len(buttons) >= 2:
+        #     buttons[1].click()
+        # else:
+        #     buttons[0].click()
 
     soup = BeautifulSoup(browser.page_source, features='html.parser')
     browser.quit()

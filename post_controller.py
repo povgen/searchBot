@@ -50,7 +50,7 @@ async def show_posts(message):
         caption = caption.replace('*', '\*')
 
         image = post['img']
-        logging.info('Выводим перед просмотр объявления:')
+        logging.info('Выводим предпросмотр объявления:')
         logging.info(post)
 
         img_file = requests.get(image)
@@ -83,7 +83,8 @@ async def show_post(callback_query):
 
     post = await get_cached_data(post_url, get_post, user.to_increment_count_of_requests)
 
-    logging.info('Показ объявления: ' + post)
+    logging.info('Показ объявления: ')
+    logging.info(post)
 
     images = []
     for index, img in enumerate(post['images']):
