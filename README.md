@@ -7,6 +7,7 @@
 - С помощью бота https://t.me/BotFather в телеграмме создайте своего бота
 - Скопируйте/переименуйте файл template.env в .env
 - В переменную API_TOKEN положите токен вашего бота
+- Так же необходимо иметь установленный браузер chrome (через некоторое время добавлю его установку через докер) 
 #### Через docker:
 - Опционально можете добавить volumes, для дампа redis (/data) и для логов бота (/app/logs)
 ```yaml
@@ -30,9 +31,9 @@ services:
       - /your_directory:/app/logs
 
 ```
-- Выполните команду "docker compose up" 
+- Запустите контейнеры выполнив следующую команду
 ```shell
- docker-compose up
+ docker compose up
 ```
 #### Если docker'а нет:
 - Установите redis https://redis.io/docs/getting-started/installation/install-redis-on-windows/
