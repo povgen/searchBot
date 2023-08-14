@@ -1,3 +1,4 @@
+import json
 import logging
 import urllib
 
@@ -49,7 +50,9 @@ async def show_posts(message):
         caption = caption.replace('*', '\*')
 
         image = post['img']
-        logging.info('Выводим перед просмотр объявления:' + post)
+        logging.info('Выводим перед просмотр объявления:')
+        logging.info(post)
+
         img_file = requests.get(image)
 
         if img_file.content.__sizeof__() > 10000000:

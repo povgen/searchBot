@@ -15,8 +15,13 @@ async def _get_soap_from_page(url) -> BeautifulSoup():
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    #
+
     browser = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
+
+    #todo переделать на
+    # element = driver.find_element_by_class_name('pagination-r')
+    # driver.execute_script("arguments[0].click();", element)
+    # https://stackoverflow.com/questions/37879010/selenium-debugging-element-is-not-clickable-at-point-x-y
 
     browser.get(url)
     buttons = browser.find_elements(By.CLASS_NAME, 'ButtonExpand_expandHolder__ZnxCZ')

@@ -1,5 +1,5 @@
 /.idea/*
 /geckodriver.log
 /.env
-/log.log
-/feedback.txt
+/logs/feedback.txt
+/logs/log.log
