@@ -36,8 +36,8 @@ services:
 ```
 #### Если docker'а нет:
 - Установите redis https://redis.io/docs/getting-started/installation/install-redis-on-windows/
-- Для работы Selenium, необходимо иметь установленный браузер Chrome
 - Подправьте .env файл указав туда в соответствующие переменные хост (localhost) и порт redis
+- Для работы Selenium, необходимо иметь установленный браузер Chrome или firefox, если у вас второе то так же подправьте .env: SELENIUM_BROWSER=firefox
 - выполните команду
 ```shell
  py main.py

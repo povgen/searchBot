@@ -19,11 +19,13 @@ logging.basicConfig(level=logging.INFO, filename="logs/log.log")
 @dp.message_handler(commands=['start'])
 async def send_welcome(message):
     user = User(message['from'].id)
-    user.user_info = message["from"]
+    user.user_info = message["from"].__dict__['_values']
 
     await bot.send_message(message.chat.id,
                            f'Привет, {message["from"].first_name}, я могу найти для тебя что-нибудь',
                            reply_markup=default_keyboard)
+
+    user.save()
 
 
 @dp.message_handler(commands=['feedback'])

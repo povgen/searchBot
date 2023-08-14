@@ -27,7 +27,6 @@ class Database:
         vals = ', '.join(':' + col for col in keys)
 
         sql = f'INSERT INTO {table} ({cols}) VALUES ({vals})'
-        print(sql)
         return cls.execute(sql, data)
 
     @classmethod

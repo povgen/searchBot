@@ -20,6 +20,8 @@ def add_to_registered_users_list(user_id):
         registered_users = [user_id]
     else:
         registered_users = json.JSONDecoder().decode(registered_users)
+        if user_id in registered_users:
+            return
         registered_users.append(user_id)
 
     r.set('registered_users', json.JSONEncoder().encode(registered_users))
@@ -55,4 +57,5 @@ class User:
         self.count_of_requests += 1
 
     def save(self):
+        print(self.__dict__)
         r.set(self.user_id, json.JSONEncoder().encode(self.__dict__))
