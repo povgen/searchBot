@@ -16,7 +16,7 @@ async def _get_soap_from_page(url) -> BeautifulSoup():
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     #
-    browser = webdriver.Firefox(options=options, service=Service(ChromeDriverManager().install()))
+    browser = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
 
     browser.get(url)
     buttons = browser.find_elements(By.CLASS_NAME, 'ButtonExpand_expandHolder__ZnxCZ')
