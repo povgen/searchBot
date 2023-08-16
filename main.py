@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import os
 
@@ -6,9 +7,10 @@ from aiogram import types
 from aiogram.dispatcher import filters, FSMContext
 from aiogram.utils import executor
 
+from helper import var_dump
 from keyboards import default_keyboard, order_keyboard
 from post_controller import show_posts, usersData, show_post, post_count_on_page
-from settings import dp, bot, BotStates, orders
+from settings import dp, bot, BotStates, orders, r
 from translator import translate_to_sr
 from user import User
 
@@ -26,6 +28,22 @@ async def send_welcome(message):
                            reply_markup=default_keyboard)
 
     user.save()
+
+
+@dp.message_handler(commands=['users'])
+async def get_users(message):
+    if message['from'].id != 1843600386:
+        return
+
+    user_id_list = json.JSONDecoder().decode(r.get('registered_users'))
+
+    for user_id in user_id_list:
+        user_info = r.get(user_id)
+        if user_info is not None:
+            msg = var_dump(json.JSONDecoder().decode(user_info))
+            await bot.send_message(message.chat.id, msg)
+        else:
+            await bot.send_message(message.chat.id, f'пользователь с id: {user_id}, не найден :(')
 
 
 @dp.message_handler(commands=['feedback'])

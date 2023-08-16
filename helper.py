@@ -66,3 +66,20 @@ class Store:
     def get_data(self, data_hash):
         """По хэшу получаем сохраненные ранее данные"""
         return None if data_hash not in self.cache else self.cache[data_hash]
+
+
+def var_dump(variable, indent=0, padding=4):
+    indentation = " " * indent
+
+    if isinstance(variable, (list, tuple)):
+        result = [var_dump(item, indent + padding, padding) for item in variable]
+        return '\n' + (',\n'.join(result)) + '\n' + indentation
+
+    if isinstance(variable, dict):
+        result = []
+        for key, value in variable.items():
+            value_str = var_dump(value, indent + padding, padding)
+            result.append(f'{indentation}{key}: {value_str}')
+        return '\n'+(',\n'.join(result))
+
+    return repr(variable)

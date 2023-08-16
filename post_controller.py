@@ -29,10 +29,11 @@ async def show_posts(message):
     url = 'https://novi.kupujemprodajem.com/pretraga?' + urllib.parse.urlencode(user.request_params)
 
     searched_data = await get_cached_data(url, search_posts, user.to_increment_count_of_requests)
+    user.save()  # сохраняем увеличенное кол-во запросов
+
     posts = searched_data['posts']
     total = searched_data['total']
     offset = user.offset
-
     if len(posts) == 0:
         await bot.send_message(message.chat.id, 'По вашему запросу ничего не найдено :(')
         return
@@ -82,6 +83,7 @@ async def show_post(callback_query):
     user = User(callback_query.from_user.id)
 
     post = await get_cached_data(post_url, get_post, user.to_increment_count_of_requests)
+    user.save()  # сохраняем увеличенное кол-во запросов
 
     logging.info('Показ объявления: ')
     logging.info(post)

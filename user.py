@@ -3,16 +3,6 @@ import json
 from helper import r
 
 
-def get_user(user_id):
-    user = r.get(user_id)
-    if user is None:
-        user = User(user_id)
-    else:
-        user = json.JSONDecoder().decode(user)
-
-    return user
-
-
 def add_to_registered_users_list(user_id):
     registered_users = r.get('registered_users')
 
@@ -57,5 +47,4 @@ class User:
         self.count_of_requests += 1
 
     def save(self):
-        print(self.__dict__)
         r.set(self.user_id, json.JSONEncoder().encode(self.__dict__))
