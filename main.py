@@ -24,7 +24,8 @@ async def send_welcome(message):
     user.user_info = message["from"].__dict__['_values']
 
     await bot.send_message(message.chat.id,
-                           f'Привет, {message["from"].first_name}, я могу найти для тебя что-нибудь',
+                           f'Привет, {message["from"].first_name}, я могу найти для тебя что-нибудь\n'
+                           f'Для этого просто напиши, что ты ищешь',
                            reply_markup=default_keyboard)
 
     user.save()
