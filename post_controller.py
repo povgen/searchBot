@@ -24,8 +24,10 @@ def get_post_item_keyboard(url):
     ])
 
 
-async def show_posts(message):
-    user = User(message['from'].id)
+async def show_posts(message, user=None):
+    if user is None:
+        user = User(message['from'].id)
+
     url = 'https://novi.kupujemprodajem.com/pretraga?' + urllib.parse.urlencode(user.request_params)
 
     searched_data = await get_cached_data(url, search_posts, user.to_increment_count_of_requests)

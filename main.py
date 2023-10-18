@@ -91,7 +91,7 @@ async def prev_posts(message):
         user.offset -= post_count_on_page
 
     user.save()
-    await show_posts(message)
+    await show_posts(message, user)
 
 
 @dp.message_handler(text='➡️ ️Дальше')
@@ -106,7 +106,7 @@ async def next_posts(message):
         user.offset += post_count_on_page
 
     user.save()
-    await show_posts(message)
+    await show_posts(message, user)
 
 
 @dp.message_handler(filters.Text(startswith='📶'))
@@ -121,7 +121,7 @@ async def next_posts(message):
         user.save()
         await bot.send_message(message.chat.id, 'Сортировка изменена, возвращаемся к просмотру...',
                                reply_markup=default_keyboard)
-        await show_posts(message)
+        await show_posts(message, user)
     else:
         await bot.send_message(message.chat.id, f'Пожалуйста выберите из списка',
                                reply_markup=order_keyboard)
