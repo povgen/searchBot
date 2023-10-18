@@ -90,6 +90,7 @@ async def prev_posts(message):
     else:
         user.offset -= post_count_on_page
 
+    user.save()
     await show_posts(message)
 
 
@@ -104,6 +105,7 @@ async def next_posts(message):
     else:
         user.offset += post_count_on_page
 
+    user.save()
     await show_posts(message)
 
 
@@ -116,6 +118,7 @@ async def next_posts(message):
                                reply_markup=order_keyboard)
     elif message.text in orders:
         user.request_params['order'] = orders[message.text]
+        user.save()
         await bot.send_message(message.chat.id, 'Сортировка изменена, возвращаемся к просмотру...',
                                reply_markup=default_keyboard)
         await show_posts(message)
