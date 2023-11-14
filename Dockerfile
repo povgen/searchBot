@@ -1,10 +1,11 @@
-FROM python:latest
+FROM python:3.9.13-alpine
 LABEL authors="povgen"
 
 WORKDIR /app
 
 COPY . .
 
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 RUN ["chmod", "+x", "./docker/install_browser.sh"]
