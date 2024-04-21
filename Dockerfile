@@ -1,4 +1,4 @@
-FROM python:3.9.13-alpine
+FROM python:3.9.13
 LABEL authors="povgen"
 
 WORKDIR /app
