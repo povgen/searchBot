@@ -45,3 +45,8 @@ services:
 ____
 в файле logs/log.log хранятся логи работы бота
 в файле logs/feedback.txt хранятся обратная связь от пользователей 
+____
+Запуск редиса
+```shell
+docker run --name some-redis -d redis
+```
