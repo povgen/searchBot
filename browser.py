@@ -7,11 +7,11 @@ from settings import get_webdriver
 from translator import translate_to_ru
 
 
-async def _get_soap_from_page(url) -> BeautifulSoup():
+async def _get_soap_from_page(url) -> BeautifulSoup:
     browser = get_webdriver()
 
     browser.get(url)
-    buttons = browser.find_elements(By.CLASS_NAME, 'ButtonExpand_expandHolder__ZnxCZ')
+    buttons = browser.find_elements(By.CLASS_NAME, 'ButtonExpand_expandHolder__JnA8X')
     if len(buttons) > 0:
         browser.execute_script("arguments[0].click();", buttons[1 if len(buttons) >= 2 else 0])
 
@@ -24,10 +24,10 @@ async def search_posts(source_url):
     soup = await _get_soap_from_page(source_url)
     logging.info('url запроса: ' + source_url)
     posts = []
-    crumbs = soup.findAll('div', 'BreadcrumbHolder_breadcrumb__utk3j')[0]
+    crumbs = soup.findAll('div', 'BreadcrumbHolder_breadcrumbHolder__riFtq')[0]
     crumbs = crumbs.find_next('div')
     total = int(crumbs.text.split('>')[-1].split('rezultata')[0].replace('.', ''))
-    cards = soup.findAll('section', 'AdItem_adOuterHolder__i2qTf')
+    cards = soup.findAll('section', 'AdItem_adOuterHolder__lACeh')
     for card in cards:
         article = card.find_next('article')
         main_block = article.find_next('a').find_next_sibling('div')
@@ -64,13 +64,12 @@ async def search_posts(source_url):
 async def get_post(url):
     soup = await _get_soap_from_page(url)
 
-    price = soup.findAll('div', 'AdViewInfo_adInfoPrice__pVuSx')[0].find_next('h2').text
-    title_block = soup.findAll('div', 'AdViewInfo_nameHolder__md4J1')[0]
-    title = title_block.find_next('h1').text
-    condition = title_block.find_next('div').text
-    [account_age, location] = soup.findAll('div', 'UserSummary_userDetails__tNXN7')[0].find_next('div').contents
+    price = soup.select_one('h2.AdViewInfo_price__J_NcC').text
+    title = soup.select_one('h1.AdViewInfo_name__VIhrl').text
+    condition = soup.select_one('.AdViewInfoData_conditionAndAvailableNowHolder__mk0TA > div:nth-child(1)').text
+    location = soup.select_one('.AdViewInfoData_adViewDataHolder__4kPlh > div:nth-child(1)').text
 
-    buttons = soup.findAll('div', 'ButtonExpand_holder___pAqB')
+    buttons = soup.findAll('div', 'ButtonExpand_holder__cJJnC')
 
     if len(buttons) == 1:
         phone = buttons[0].find_next('span').text
@@ -79,9 +78,9 @@ async def get_post(url):
     else:
         phone = '-'
 
-    info = soup.findAll('section', 'AdViewDescription_descriptionHolder__9hET7')[0].find_next('div')
+    info = soup.select_one('.AdViewDescription_descriptionHolder__kOWyx > div:nth-child(1)')
     images_src = []
-    images = soup.findAll('div', 'GalleryThumbnail_imageGalleryThumbnailInner___ou1n')
+    images = soup.findAll('div', 'GalleryThumbnail_imageGalleryThumbnailInner__Kr_Oz')
     for image in images:
         images_src.append(image.find_next('img').get_attribute_list('src')[0].replace('tmb-300x300-', ''))
 
@@ -93,5 +92,5 @@ async def get_post(url):
         'description': translate_to_ru(info.text),
         'images': images_src,
         'phone': phone,
-        'location': location.text
+        'location': location
     }
