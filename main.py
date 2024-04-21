@@ -15,7 +15,7 @@ from translator import translate_to_sr
 from user import User
 
 os.makedirs('logs', exist_ok=True)
-logging.basicConfig(level=logging.INFO, filename="logs/log.log")
+logging.basicConfig(level=logging.INFO, filename="logs/log.log", format="%(asctime)s;%(levelname)s;%(message)s")
 
 
 @dp.message_handler(commands=['start'])
