@@ -28,7 +28,7 @@ async def show_posts(message, user=None):
     if user is None:
         user = User(message['from'].id)
 
-    url = 'https://novi.kupujemprodajem.com/pretraga?' + urllib.parse.urlencode(user.request_params)
+    url = 'https://kupujemprodajem.com/pretraga?' + urllib.parse.urlencode(user.request_params)
 
     searched_data = await get_cached_data(url, search_posts, user.to_increment_count_of_requests)
     user.save()  # сохраняем увеличенное кол-во запросов

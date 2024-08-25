@@ -48,7 +48,7 @@ async def search_posts(source_url):
         posts.append({
             'img': img.replace('tmb-300x300', 'big'),
             'small_img': img,
-            'url': 'https://novi.kupujemprodajem.com' + url,
+            'url': 'https://kupujemprodajem.com' + url,
             'title': translate_to_ru(title),
             'description': translate_to_ru(description),
             'price': translate_to_ru(price),
@@ -66,8 +66,8 @@ async def get_post(url):
 
     price = soup.select_one('h2.AdViewInfo_price__J_NcC').text
     title = soup.select_one('h1.AdViewInfo_name__VIhrl').text
-    condition = soup.select_one('.AdViewInfoData_conditionAndAvailableNowHolder__mk0TA > div:nth-child(1)').text
-    location = soup.select_one('.AdViewInfoData_adViewDataHolder__4kPlh > div:nth-child(1)').text
+    condition = soup.select_one('.AdViewAdditionalData_conditionAndAvailableAdHolder__BnlFr > div:nth-child(1)').text
+    location = soup.select_one('.UserSummary_userLocation__FTK_2').text
 
     buttons = soup.findAll('div', 'ButtonExpand_holder__cJJnC')
 

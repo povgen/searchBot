@@ -3,17 +3,17 @@ import json
 from settings import r
 
 
-async def get_cached_data(url: str, get_data: callable, hook_get_data: callable = None) -> list or dict:
+async def get_cached_data(url: str, get_data_callback: callable, hook_get_data: callable = None) -> list or dict:
     """
     Метод для кэширования запросов
     url - запрос для получения данных,
-    get_data - функция для получения данных, в случае их отсутствия в кэше
+    get_data_callback - функция для получения данных, в случае их отсутствия в кэше
     """
 
     data = r.get(url)
 
     if data is None:
-        data = await get_data(url)
+        data = await get_data_callback(url)
         r.set(url, json.JSONEncoder().encode(data))
         r.expire(url, 60 * 60 * 24)
         if hook_get_data is not None:

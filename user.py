@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from helper import r
 
@@ -23,6 +24,7 @@ class User:
     offset: int
     count_of_requests: int = 0
     user_info: dict
+    last_action: str
 
     def __init__(self, user_id):
         user_data = r.get(user_id)
@@ -47,4 +49,5 @@ class User:
         self.count_of_requests += 1
 
     def save(self):
+        self.last_action = datetime.now().isoformat()
         r.set(self.user_id, json.JSONEncoder().encode(self.__dict__))
